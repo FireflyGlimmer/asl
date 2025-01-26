@@ -4,11 +4,16 @@ import (
 	inlay "ASL/config"
 	"os"
 	"path/filepath"
+	"runtime"
 )
 
 // Config
 var EXEC_PATH string
 var YAML_PATH string
+var DEVICE_ARCH string
+
+const MIRRORS_URL string = "https://images.linuxcontainers.org/meta/simplestreams/v1/images.json"
+const USER_AGENT string = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 Edg/132.0.0.0"
 
 // App
 var ASL_VERSION string
@@ -38,9 +43,11 @@ func IsFileExists(filePath string) bool {
 }
 
 func InitializeAslConfig() {
-	Logger := NewTinyLogger("InitializeAslConfig")
+	logger := NewTinyLogger("InitializeAslConfig")
+	// Config
 	EXEC_PATH, _ = os.Executable()
 	YAML_PATH = filepath.Join(filepath.Dir(EXEC_PATH), "config", "asl.yaml")
+	DEVICE_ARCH = runtime.GOARCH
 	if IsFileExists(YAML_PATH) {
 		DEFAULT_CONFIG := GetEmbededAslConfig()
 		LOCAL_CONFIG := GetLocalAslConfig()
@@ -68,7 +75,7 @@ func InitializeAslConfig() {
 	} else {
 		err := os.Mkdir(filepath.Dir(YAML_PATH), 0755)
 		if err != nil {
-			Logger.Error("Error creating %s: %v", filepath.Dir(YAML_PATH), err)
+			logger.Error("Error creating %s: %v", filepath.Dir(YAML_PATH), err)
 		} else {
 			os.WriteFile(YAML_PATH, []byte(inlay.AslYAML), 0644)
 			DEFAULT_CONFIG := GetEmbededAslConfig()

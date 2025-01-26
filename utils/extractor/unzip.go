@@ -12,6 +12,7 @@ type UnZip struct{}
 
 func (z *UnZip) Extract(inputFile, outputFolder string) {
 	logger := logger.NewLogger("UnZip")
+
 	// 全部的内存地址
 	zipFile, err := zip.OpenReader(inputFile)
 	if err != nil {

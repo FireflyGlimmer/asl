@@ -42,25 +42,27 @@ type DeployConfiguration struct {
 }
 
 func GetEmbededAslConfig() *Configuration {
-	Logger := NewTinyLogger("GetEmbededAslConfig")
+	logger := NewTinyLogger("GetEmbededAslConfig")
+
 	var aslConfig Configuration
 	err := yaml.Unmarshal([]byte(inlay.AslYAML), &aslConfig)
 	if err != nil {
-		Logger.Error("Error unmarshaling asl.yaml: %v", err)
+		logger.Error("Error unmarshalling asl.yaml: %v", err)
 	}
 	return &aslConfig
 }
 
 func GetLocalAslConfig() *Configuration {
-	Logger := NewTinyLogger("GetLocalAslConfig")
+	logger := NewTinyLogger("GetLocalAslConfig")
+
 	var aslConfig Configuration
 	aslYAML, err := os.ReadFile(YAML_PATH)
 	if err != nil {
-		Logger.Error("Error opening asl.yaml: %v", err)
+		logger.Error("Error opening asl.yaml: %v", err)
 	}
 	err = yaml.Unmarshal([]byte(aslYAML), &aslConfig)
 	if err != nil {
-		Logger.Error("Error unmarshaling asl.yaml: %v", err)
+		logger.Error("Error unmarshalling asl.yaml: %v", err)
 	}
 	return &aslConfig
 }

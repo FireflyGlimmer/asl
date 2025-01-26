@@ -2,8 +2,6 @@ package config
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 	"time"
 )
 
@@ -105,10 +103,5 @@ func (l *Logger) Error(format string, args ...interface{}) error {
 }
 
 func NewTinyLogger(tag string) *Logger {
-	outputFolder := "log"
-	logFileName := time.Now().Format("20060102") + ".txt"
-	logFilePath := filepath.Join(logFileName, outputFolder)
-	logFile, _ := os.OpenFile(logFilePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644) // 备注：记得处理错误
-	defer logFile.Close()
 	return &Logger{entry: LogEntry{tag: tag}}
 }

@@ -11,6 +11,7 @@ type Extractor interface {
 // 通用解包函数
 func NewExtractor(fileType string) Extractor {
 	logger := logger.NewLogger("NewExtractor")
+
 	logger.Debug("InputFile extention: %s", fileType)
 	switch fileType {
 	case ".zip":

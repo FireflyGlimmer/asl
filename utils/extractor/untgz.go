@@ -13,6 +13,7 @@ type UnTgz struct{}
 
 func (t *UnTgz) Extract(inputFile, outputFolder string) {
 	logger := logger.NewLogger("UnTgz")
+
 	tgzFile, err := os.Open(inputFile)
 	if err != nil {
 		logger.Error("Error opening %s: %v", inputFile, err)
