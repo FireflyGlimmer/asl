@@ -16,6 +16,7 @@ func Extractor(inputFile, outputFolder string) {
 		extractor.Extract(inputFile, outputFolder)
 	} else {
 		logger.Error("Error extracting %s: %v", inputFile, extractor)
+		return
 	}
 }
 

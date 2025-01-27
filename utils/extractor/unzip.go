@@ -17,6 +17,7 @@ func (z *UnZip) Extract(inputFile, outputFolder string) {
 	zipFile, err := zip.OpenReader(inputFile)
 	if err != nil {
 		logger.Error("Error opening %s: %v", inputFile, err)
+		return
 	}
 	defer zipFile.Close()
 
@@ -24,6 +25,7 @@ func (z *UnZip) Extract(inputFile, outputFolder string) {
 	err = os.MkdirAll(outputFolder, 0755)
 	if err != nil {
 		logger.Error("Error creating %s directory: %v", outputFolder, err)
+		return
 	}
 
 	/*
@@ -34,8 +36,8 @@ func (z *UnZip) Extract(inputFile, outputFolder string) {
 		logger.Debug("Processing %s", file.Name)
 		zipContent, err := file.Open()
 		if err != nil {
-			logger.Warn("Error reading %s: %v", file.Name, err)
-			continue // 继续读取文件，而不是中断
+			logger.Error("Error reading %s: %v", file.Name, err)
+			return
 		}
 		defer zipContent.Close()
 
@@ -44,16 +46,19 @@ func (z *UnZip) Extract(inputFile, outputFolder string) {
 			err := os.MkdirAll(targetPath, file.Mode()) // 还原文件夹Mode
 			if err != nil {
 				logger.Error("Error creating %s directory: %v", targetPath, err)
+				return
 			}
 		} else {
 			newFileContent, err := os.OpenFile(targetPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode()) // 以压缩包的Mode创建文件
 			if err != nil {
 				logger.Error("Error creating %s file: %v", targetPath, err)
+				return
 			}
 			defer newFileContent.Close()
 			_, err = io.Copy(newFileContent, zipContent) // 将内容复制到创建的文件
 			if err != nil {
 				logger.Error("Error copying %s to %s: %v", file.Name, targetPath, err)
+				return
 			}
 		}
 	}

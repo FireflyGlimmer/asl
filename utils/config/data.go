@@ -76,8 +76,13 @@ func InitializeAslConfig() {
 		err := os.Mkdir(filepath.Dir(YAML_PATH), 0755)
 		if err != nil {
 			logger.Error("Error creating %s: %v", filepath.Dir(YAML_PATH), err)
+			return
 		} else {
-			os.WriteFile(YAML_PATH, []byte(inlay.AslYAML), 0644)
+			err := os.WriteFile(YAML_PATH, []byte(inlay.AslYAML), 0644)
+			if err != nil {
+				logger.Error("Error writing %s: %v", YAML_PATH, err)
+				return
+			}
 			DEFAULT_CONFIG := GetEmbededAslConfig()
 			LOCAL_CONFIG := GetLocalAslConfig()
 			// App

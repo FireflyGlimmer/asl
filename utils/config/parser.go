@@ -48,6 +48,7 @@ func GetEmbededAslConfig() *Configuration {
 	err := yaml.Unmarshal([]byte(inlay.AslYAML), &aslConfig)
 	if err != nil {
 		logger.Error("Error unmarshalling asl.yaml: %v", err)
+		return nil
 	}
 	return &aslConfig
 }
@@ -59,10 +60,12 @@ func GetLocalAslConfig() *Configuration {
 	aslYAML, err := os.ReadFile(YAML_PATH)
 	if err != nil {
 		logger.Error("Error opening asl.yaml: %v", err)
+		return nil
 	}
 	err = yaml.Unmarshal([]byte(aslYAML), &aslConfig)
 	if err != nil {
 		logger.Error("Error unmarshalling asl.yaml: %v", err)
+		return nil
 	}
 	return &aslConfig
 }
