@@ -44,10 +44,11 @@ func (t *Task) Download() {
 	defer fileContent.Close()
 
 	// 写入文件
-	buffer := make([]byte, 1024)
-	progressBar := &ProgressBar{value: 0, length: int(response.ContentLength)}
+	buffer := make([]byte, 32*1024) // 32KB
+	progressBar := NewProgressBar(0, int(response.ContentLength))
 	reader := bufio.NewReader(response.Body)
 	writer := bufio.NewWriter(fileContent)
+	logger.Info("Downloading %s", t.name)
 	for {
 		n, err := reader.Read(buffer)
 		if err != nil && err != io.EOF {
@@ -62,10 +63,10 @@ func (t *Task) Download() {
 			return
 		}
 		progressBar.SetValue(progressBar.value + n)
-		progressBar.SetLength(progressBar.length + n)
-		logger.Info("Download progress: %d%%", progressBar.GetProgress())
+		progressBar.Print()
 	}
 	writer.Flush()
+	logger.Info("Download complete: %s", t.name)
 }
 
 func NewTask(inputName, inputUrl, outputFolder string) *Task {
