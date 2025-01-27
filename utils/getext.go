@@ -6,12 +6,15 @@ import (
 )
 
 func GetExt(filePath string) string {
-	fileBase := filepath.Base(filePath)
-	fileExt := filepath.Ext(filePath)
-	fileExtIndex := strings.LastIndexByte(filepath.Base(filePath), '.')
-	if fileExtIndex == -1 {
-		return fileExt
-	} else {
-		return filepath.Ext(fileBase[:fileExtIndex]) + fileExt
+	compressExts := map[string]bool{
+		".tar.xz": true,
+		".tar.gz": true,
 	}
+	fileName := filepath.Base(filePath)
+	for ext := range compressExts {
+		if strings.HasSuffix(fileName, ext) {
+			return ext
+		}
+	}
+	return filepath.Ext(fileName)
 }
