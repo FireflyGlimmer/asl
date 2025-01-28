@@ -3,6 +3,7 @@ package utils
 func CmdArgs(args []string) {
 	if len(args) == 1 {
 		ShowUsage()
+		return
 	}
 
 	switch args[1] {

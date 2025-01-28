@@ -12,18 +12,18 @@ import (
 func ParserMirrors(linuxType, linuxVersion string) (string, string) {
 	logger := logger.NewLogger("ParserMirrors")
 
-	productName := linuxType + ":" + linuxVersion + ":" + config.DEVICE_ARCH + ":" + "default"
+	productName := linuxType + ":" + linuxVersion + ":" + config.DeviceArch + ":" + "default"
 
 	// 创建Http Client
 	client := &http.Client{}
 
 	// 创建Http Request
-	req, err := http.NewRequest("GET", config.MIRRORS_URL, nil)
+	req, err := http.NewRequest("GET", config.MirrorsUrl, nil)
 	if err != nil {
 		logger.Error("Error creating request: %v", err)
 		return "", ""
 	}
-	req.Header.Set("User-Agent", config.USER_AGENT)
+	req.Header.Set("User-Agent", config.UserAgent)
 
 	// 发送Http Request
 	response, err := client.Do(req)

@@ -7,8 +7,7 @@ import (
 )
 
 func main() {
+	// 初始化配置
 	config.InitializeAslConfig()
-	if len(os.Args) > 1 {
-		utils.CmdArgs(os.Args)
-	}
+	utils.CmdArgs(os.Args)
 }

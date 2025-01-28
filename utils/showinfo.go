@@ -24,7 +24,7 @@ func ShowUsage() {
 }
 
 func ShowVersion() {
-	fmt.Printf("ASL Version: %s\n", config.ASL_VERSION)
+	fmt.Printf("ASL Version: %s\n", config.ASLVersion)
 	fmt.Println("Author: FireflyGlimmer")
 	fmt.Println("Repo Url: https://github.com/FireflyGlimmer/asl")
 }

@@ -1,8 +1,6 @@
-# 此配置将在ASL启动时被读取
 app:
-  # ASL程序版本
-  ASL_VERSION: v0.1
-  WORK_DIR:
+  asl_version: v0.1
+  work_dir:
     - home
     - home/container
     - home/status
@@ -11,10 +9,8 @@ app:
     - lib
     - libexec
     - tmp
-  # ASL工作模式 proot & unshare
-  DEFAULT_MODE: unshare
-  # ASL容器分区挂载
-  MOUNT_PARTITIONS:
+  default_mode: unshare
+  mount_partitions:
     - /
     - /proc
     - /sys
@@ -26,24 +22,20 @@ app:
     - /dev/net/tun
     - /proc/sys/fs/binfmt_misc
     - /sdcard
-  # ASL Debug LOG输出（true & false）
-  IS_DEBUG: true
-  IS_FILELOGGING: false
+  is_debug: true
+  is_filelogging: false
 
 linux:
-  # Linux Shell配置
-  PATH:
+  path:
     - $ASL_TOOLKIT
     - $ASL_TOOLKIT/busybox
     - $PATH
-  LD_LIBRARY_PATH+: :$ASL_LIB
-  # proot必要配置
-  PROOT_TMP_DIR: $ASL_TMP
-  PROOT_LOADER: $ASL_LIBEXEC/libloader.so
+  ld_library_path+: :$ASL_LIB
+  proot_tmp_dir: $ASL_TMP
+  proot_loader: $ASL_LIBEXEC/libloader.so
 
 deploy:
-  # 部署顺序
-  INITIAL_SEQUENCE:
+  initial_sequence:
     - hosts
     - hostname
     - timezone
@@ -51,16 +43,12 @@ deploy:
     - user
     - sudo
     - aid
-  LATER_SEQUENCE:
+  later_sequence:
     - ssh
-  # 是否要创建用户（true & false）
-  CREATE_USER: true
-  # 用户名
-  USER_NAME: yaoxiaonie
-  # 用户密码
-  USER_PASSWORD: asl123456
-  # 特权用户权限
-  PRIVILEGED_USERS:
+  is_create_user: true
+  user_name: yaoxiaonie
+  user_password: asl123456
+  privileged_users:
     - "$USER_NAME:aid_inet"
     - "$USER_NAME:aid_sdcard_rw"
     - "$USER_NAME:aid_graphics"

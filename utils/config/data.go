@@ -8,34 +8,28 @@ import (
 )
 
 // Config
-var EXEC_PATH string
-var YAML_PATH string
-var DEVICE_ARCH string
+var ExecPath string
+var YAMLPath string
+var DeviceArch string
 
-const MIRRORS_URL string = "https://images.linuxcontainers.org/meta/simplestreams/v1/images.json"
-const USER_AGENT string = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 Edg/132.0.0.0"
+const MirrorsUrl string = "https://images.linuxcontainers.org/meta/simplestreams/v1/images.json"
+const UserAgent string = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 Edg/132.0.0.0"
 
 // App
-var ASL_VERSION string
-var IS_DEBUG bool
-var IS_FILELOGGING bool
-var DEFAULT_MODE string
-var WORK_DIR []string
-var MOUNT_PARTITIONS []string
-
-// Linux
-var PATH []string
-var LD_LIBRARY_PATH []string
-var PROOT_TMP_DIR string
-var PROOT_LOADER string
+var ASLVersion string
+var IsDebug bool
+var IsFileLogging bool
+var DefaultMode string
+var WorkDir []string
+var MountPartitions []string
 
 // Deploy
-var INITIAL_SEQUENCE []string
-var LATER_SEQUENCE []string
-var CREATE_USER bool
-var USER_NAME string
-var USER_PASSWORD string
-var PRIVILEGED_USERS []string
+var InitialSequence []string
+var LaterSequence []string
+var IsCreateUser bool
+var UserName string
+var UserPassword string
+var PrivilegedUsers []string
 
 func IsFileExists(filePath string) bool {
 	_, err := os.Lstat(filePath)
@@ -45,67 +39,55 @@ func IsFileExists(filePath string) bool {
 func InitializeAslConfig() {
 	logger := NewTinyLogger("InitializeAslConfig")
 	// Config
-	EXEC_PATH, _ = os.Executable()
-	YAML_PATH = filepath.Join(filepath.Dir(EXEC_PATH), "config", "asl.yaml")
-	DEVICE_ARCH = runtime.GOARCH
-	if IsFileExists(YAML_PATH) {
+	ExecPath, _ = os.Executable()
+	YAMLPath = filepath.Join(filepath.Dir(ExecPath), "config", "asl.yaml")
+	DeviceArch = runtime.GOARCH
+	if IsFileExists(YAMLPath) {
 		DEFAULT_CONFIG := GetEmbededAslConfig()
 		LOCAL_CONFIG := GetLocalAslConfig()
 		// App
-		ASL_VERSION = DEFAULT_CONFIG.App.ASL_VERSION
-		IS_DEBUG = LOCAL_CONFIG.App.IS_DEBUG
-		IS_FILELOGGING = LOCAL_CONFIG.App.IS_FILELOGGING
-		DEFAULT_MODE = LOCAL_CONFIG.App.DEFAULT_MODE
-		WORK_DIR = DEFAULT_CONFIG.App.WORK_DIR
-		MOUNT_PARTITIONS = DEFAULT_CONFIG.App.MOUNT_PARTITIONS
-
-		// Linux
-		PATH = DEFAULT_CONFIG.Linux.PATH
-		LD_LIBRARY_PATH = DEFAULT_CONFIG.Linux.LD_LIBRARY_PATH
-		PROOT_TMP_DIR = DEFAULT_CONFIG.Linux.PROOT_TMP_DIR
-		PROOT_LOADER = DEFAULT_CONFIG.Linux.PROOT_LOADER
+		ASLVersion = DEFAULT_CONFIG.App.ASLVersion
+		IsDebug = LOCAL_CONFIG.App.IsDebug
+		IsFileLogging = LOCAL_CONFIG.App.IsFileLogging
+		DefaultMode = LOCAL_CONFIG.App.DefaultMode
+		WorkDir = DEFAULT_CONFIG.App.WorkDir
+		MountPartitions = DEFAULT_CONFIG.App.MountPartitions
 
 		// Deploy
-		INITIAL_SEQUENCE = DEFAULT_CONFIG.Deploy.INITIAL_SEQUENCE
-		LATER_SEQUENCE = DEFAULT_CONFIG.Deploy.LATER_SEQUENCE
-		CREATE_USER = DEFAULT_CONFIG.Deploy.CREATE_USER
-		USER_NAME = DEFAULT_CONFIG.Deploy.USER_NAME
-		USER_PASSWORD = DEFAULT_CONFIG.Deploy.USER_PASSWORD
-		PRIVILEGED_USERS = DEFAULT_CONFIG.Deploy.PRIVILEGED_USERS
+		InitialSequence = LOCAL_CONFIG.Deploy.InitialSequence
+		LaterSequence = LOCAL_CONFIG.Deploy.LaterSequence
+		IsCreateUser = LOCAL_CONFIG.Deploy.IsCreateUser
+		UserName = LOCAL_CONFIG.Deploy.UserName
+		UserPassword = LOCAL_CONFIG.Deploy.UserPassword
+		PrivilegedUsers = LOCAL_CONFIG.Deploy.PrivilegedUsers
 	} else {
-		err := os.Mkdir(filepath.Dir(YAML_PATH), 0755)
+		err := os.Mkdir(filepath.Dir(YAMLPath), 0755)
 		if err != nil {
-			logger.Error("Error creating %s: %v", filepath.Dir(YAML_PATH), err)
+			logger.Error("Error creating %s: %v", filepath.Dir(YAMLPath), err)
 			return
 		} else {
-			err := os.WriteFile(YAML_PATH, []byte(inlay.AslYAML), 0644)
+			err := os.WriteFile(YAMLPath, []byte(inlay.AslYAML), 0644)
 			if err != nil {
-				logger.Error("Error writing %s: %v", YAML_PATH, err)
+				logger.Error("Error writing %s: %v", YAMLPath, err)
 				return
 			}
 			DEFAULT_CONFIG := GetEmbededAslConfig()
 			LOCAL_CONFIG := GetLocalAslConfig()
 			// App
-			ASL_VERSION = DEFAULT_CONFIG.App.ASL_VERSION
-			IS_DEBUG = LOCAL_CONFIG.App.IS_DEBUG
-			IS_FILELOGGING = LOCAL_CONFIG.App.IS_FILELOGGING
-			DEFAULT_MODE = LOCAL_CONFIG.App.DEFAULT_MODE
-			WORK_DIR = DEFAULT_CONFIG.App.WORK_DIR
-			MOUNT_PARTITIONS = DEFAULT_CONFIG.App.MOUNT_PARTITIONS
-
-			// Linux
-			PATH = LOCAL_CONFIG.Linux.PATH
-			LD_LIBRARY_PATH = LOCAL_CONFIG.Linux.LD_LIBRARY_PATH
-			PROOT_TMP_DIR = LOCAL_CONFIG.Linux.PROOT_TMP_DIR
-			PROOT_LOADER = LOCAL_CONFIG.Linux.PROOT_LOADER
+			ASLVersion = DEFAULT_CONFIG.App.ASLVersion
+			IsDebug = LOCAL_CONFIG.App.IsDebug
+			IsFileLogging = LOCAL_CONFIG.App.IsFileLogging
+			DefaultMode = LOCAL_CONFIG.App.DefaultMode
+			WorkDir = DEFAULT_CONFIG.App.WorkDir
+			MountPartitions = DEFAULT_CONFIG.App.MountPartitions
 
 			// Deploy
-			INITIAL_SEQUENCE = LOCAL_CONFIG.Deploy.INITIAL_SEQUENCE
-			LATER_SEQUENCE = LOCAL_CONFIG.Deploy.LATER_SEQUENCE
-			CREATE_USER = LOCAL_CONFIG.Deploy.CREATE_USER
-			USER_NAME = LOCAL_CONFIG.Deploy.USER_NAME
-			USER_PASSWORD = LOCAL_CONFIG.Deploy.USER_PASSWORD
-			PRIVILEGED_USERS = LOCAL_CONFIG.Deploy.PRIVILEGED_USERS
+			InitialSequence = LOCAL_CONFIG.Deploy.InitialSequence
+			LaterSequence = LOCAL_CONFIG.Deploy.LaterSequence
+			IsCreateUser = LOCAL_CONFIG.Deploy.IsCreateUser
+			UserName = LOCAL_CONFIG.Deploy.UserName
+			UserPassword = LOCAL_CONFIG.Deploy.UserPassword
+			PrivilegedUsers = LOCAL_CONFIG.Deploy.PrivilegedUsers
 		}
 	}
 }

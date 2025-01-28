@@ -153,17 +153,17 @@ func (l *Logger) Close() {
 }
 
 func NewLogger(tag string) *Logger {
-	if config.IS_FILELOGGING {
+	if config.IsFileLogging {
 		logFileName := time.Now().Format("20060102") + ".txt"
-		logFilePath := filepath.Join(filepath.Dir(config.EXEC_PATH), "log", logFileName)
-		os.Mkdir(filepath.Join(filepath.Dir(config.EXEC_PATH), "log"), 0755)
+		logFilePath := filepath.Join(filepath.Dir(config.ExecPath), "log", logFileName)
+		os.Mkdir(filepath.Join(filepath.Dir(config.ExecPath), "log"), 0755)
 		logFile, err := os.OpenFile(logFilePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 		if err != nil {
 			defaultLogger.Error("Error opening log file %s: %v", logFilePath, err)
 			return nil
 		}
-		return &Logger{entry: LogEntry{tag: tag}, logFile: logFile, isDebug: config.IS_DEBUG, isFileLogging: config.IS_FILELOGGING}
+		return &Logger{entry: LogEntry{tag: tag}, logFile: logFile, isDebug: config.IsDebug, isFileLogging: config.IsFileLogging}
 	} else {
-		return &Logger{entry: LogEntry{tag: tag}, isDebug: config.IS_DEBUG, isFileLogging: config.IS_FILELOGGING}
+		return &Logger{entry: LogEntry{tag: tag}, isDebug: config.IsDebug, isFileLogging: config.IsFileLogging}
 	}
 }

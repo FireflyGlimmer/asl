@@ -26,7 +26,7 @@ func (t *Task) Download() {
 		logger.Error("Error creating request: %v", err)
 		return
 	}
-	req.Header.Set("User-Agent", config.USER_AGENT)
+	req.Header.Set("User-Agent", config.UserAgent)
 
 	response, err := client.Do(req)
 	if err != nil {
