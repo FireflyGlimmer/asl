@@ -10,18 +10,27 @@
 </div>
 
 ## Warning
-旧版项目已不再更新，代码现存储在本仓库的分支上
+旧版项目已不再更新维护，代码现存储在本仓库的分支上
+
+## Join In
+这是我用来学习Golang的一个项目，技术含量可能不高，欢迎各位提Issue/PR
+
+## Language
+Golang + Linux shell
 
 ## Todo list
-- [ ] 使用Go语言重构项目
+- [ ] 初始化工作环境
+- [ ] 初步部署Ubuntu
 - [ ] 支持KernelSU/Magisk/APatch
+- [ ] LXC镜像源的自定义
+- [ ] 扩大对其它Linux发行版的支持
 - [ ] 对自启动列表的管理
 - [ ] 多容器管理及启动
 - [ ] 自定义挂载点
 - [ ] run-parts和sysv初始化
 - [ ] 一键部署VNC（解决声音，黑屏）
 
-## 容器支持情况
+## Support
 - [ ] Ubuntu
 - [ ] Debian
 - [ ] ArchLinux
