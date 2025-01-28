@@ -54,6 +54,7 @@ func (t *Task) Download() {
 		n, err := reader.Read(buffer)
 		if err != nil && err != io.EOF {
 			logger.Error("Error reading response: %v", err)
+			progressBar.SetStatus(false)
 			return
 		}
 		if n == 0 {
@@ -61,9 +62,10 @@ func (t *Task) Download() {
 		}
 		if _, err := writer.Write(buffer[:n]); err != nil {
 			logger.Error("Error writing to file: %v", err)
+			progressBar.SetStatus(false)
 			return
 		}
-		progressBar.SetValue(progressBar.value + n)
+		progressBar.SetCurrentValue(progressBar.current + n)
 		progressBar.Print()
 	}
 	writer.Flush()
