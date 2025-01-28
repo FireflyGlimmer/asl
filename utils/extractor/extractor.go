@@ -5,7 +5,7 @@ import (
 )
 
 type Extractor interface {
-	Extract(inputFile, outputFolder string)
+	Extract(inputFile, outputDir string)
 }
 
 // 通用解包函数
@@ -20,6 +20,8 @@ func NewExtractor(fileType string) Extractor {
 		return &UnTar{}
 	case ".tar.gz", ".tgz":
 		return &UnTgz{}
+	case ".tar.xz", ".txz":
+		return &UnTxz{}
 	default:
 		logger.Warn("Unsupported type: %s", fileType)
 		return nil

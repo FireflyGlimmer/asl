@@ -10,54 +10,48 @@ import (
 
 type UnZip struct{}
 
-func (z *UnZip) Extract(inputFile, outputFolder string) {
+func (z *UnZip) Extract(inputFilePath, outputDir string) {
 	logger := logger.NewLogger("UnZip")
 
-	// 全部的内存地址
-	zipFile, err := zip.OpenReader(inputFile)
+	inputFile, err := zip.OpenReader(inputFilePath)
 	if err != nil {
-		logger.Error("Error opening %s: %v", inputFile, err)
+		logger.Error("Error opening %s: %v", inputFilePath, err)
 		return
 	}
-	defer zipFile.Close()
+	defer inputFile.Close()
 
-	// 创建目标路径
-	err = os.MkdirAll(outputFolder, 0755)
+	err = os.MkdirAll(outputDir, 0755)
 	if err != nil {
-		logger.Error("Error creating %s directory: %v", outputFolder, err)
+		logger.Error("Error creating %s directory: %v", outputDir, err)
 		return
 	}
 
-	/*
-		遍历文件条目
-		file是文件内存地址
-	*/
-	for _, file := range zipFile.File { // 转换成文件条目
-		logger.Debug("Processing %s", file.Name)
-		zipContent, err := file.Open()
+	for _, zipEntry := range inputFile.File {
+		logger.Debug("Processing %s", zipEntry.Name)
+		zipContent, err := zipEntry.Open()
 		if err != nil {
-			logger.Error("Error reading %s: %v", file.Name, err)
+			logger.Error("Error reading %s: %v", zipEntry.Name, err)
 			return
 		}
 		defer zipContent.Close()
 
-		targetPath := filepath.Join(outputFolder, file.Name)
-		if file.FileInfo().IsDir() {
-			err := os.MkdirAll(targetPath, file.Mode()) // 还原文件夹Mode
+		targetPath := filepath.Join(outputDir, zipEntry.Name)
+		if zipEntry.FileInfo().IsDir() {
+			err := os.MkdirAll(targetPath, zipEntry.Mode()) // 还原文件夹Mode
 			if err != nil {
 				logger.Error("Error creating %s directory: %v", targetPath, err)
 				return
 			}
 		} else {
-			newFileContent, err := os.OpenFile(targetPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode()) // 以压缩包的Mode创建文件
+			file, err := os.OpenFile(targetPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, zipEntry.Mode()) // 以压缩包的Mode创建文件
 			if err != nil {
 				logger.Error("Error creating %s file: %v", targetPath, err)
 				return
 			}
-			defer newFileContent.Close()
-			_, err = io.Copy(newFileContent, zipContent) // 将内容复制到创建的文件
+			defer file.Close()
+			_, err = io.Copy(file, zipContent) // 将内容复制到创建的文件
 			if err != nil {
-				logger.Error("Error copying %s to %s: %v", file.Name, targetPath, err)
+				logger.Error("Error copying %s to %s: %v", zipEntry.Name, targetPath, err)
 				return
 			}
 		}

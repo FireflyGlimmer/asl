@@ -6,12 +6,14 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/ulikunitz/xz"
 )
 
-type UnTar struct{}
+type UnTxz struct{}
 
-func (t *UnTar) Extract(inputFilePath, outputDir string) {
-	logger := logger.NewLogger("UnTar")
+func (t *UnTxz) Extract(inputFilePath, outputDir string) {
+	logger := logger.NewLogger("UnTxz")
 
 	inputFile, err := os.Open(inputFilePath)
 	if err != nil {
@@ -26,7 +28,13 @@ func (t *UnTar) Extract(inputFilePath, outputDir string) {
 		return
 	}
 
-	tarReader := tar.NewReader(inputFile)
+	xzReader, err := xz.NewReader(inputFile)
+	if err != nil {
+		logger.Error("Error creating xz reader: %v", err)
+		return
+	}
+
+	tarReader := tar.NewReader(xzReader)
 	hardLinks := make(map[string]string)
 	for {
 		fileHeader, err := tarReader.Next()

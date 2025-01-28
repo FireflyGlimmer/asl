@@ -72,6 +72,6 @@ func (t *Task) Download() {
 	logger.Info("Download complete: %s", t.name)
 }
 
-func NewTask(inputName, inputUrl, outputFolder string) *Task {
-	return &Task{name: inputName, url: inputUrl, out: outputFolder}
+func NewTask(inputName, inputUrl, outputDir string) *Task {
+	return &Task{name: inputName, url: inputUrl, out: outputDir}
 }

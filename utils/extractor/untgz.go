@@ -11,32 +11,33 @@ import (
 
 type UnTgz struct{}
 
-func (t *UnTgz) Extract(inputFile, outputFolder string) {
+func (t *UnTgz) Extract(inputFilePath, outputDir string) {
 	logger := logger.NewLogger("UnTgz")
 
-	tgzFile, err := os.Open(inputFile)
+	inputFile, err := os.Open(inputFilePath)
 	if err != nil {
-		logger.Error("Error opening %s: %v", inputFile, err)
+		logger.Error("Error opening %s: %v", inputFilePath, err)
 		return
 	}
-	defer tgzFile.Close()
+	defer inputFile.Close()
 
-	err = os.MkdirAll(outputFolder, 0755)
+	err = os.MkdirAll(outputDir, 0755)
 	if err != nil {
-		logger.Error("Error creating %s directory: %v", outputFolder, err)
+		logger.Error("Error creating %s directory: %v", outputDir, err)
 		return
 	}
 
-	gzFileContent, err := gzip.NewReader(tgzFile)
+	gzReader, err := gzip.NewReader(inputFile)
 	if err != nil {
 		logger.Error("Error reading content of %s: %v", inputFile, err)
 		return
 	}
-	defer gzFileContent.Close()
+	defer gzReader.Close()
 
-	tarFileContent := tar.NewReader(gzFileContent)
+	tarReader := tar.NewReader(gzReader)
+	hardLinks := make(map[string]string)
 	for {
-		fileHeader, err := tarFileContent.Next()
+		fileHeader, err := tarReader.Next()
 		if err == io.EOF {
 			break
 		}
@@ -44,28 +45,48 @@ func (t *UnTgz) Extract(inputFile, outputFolder string) {
 			logger.Error("Error reading header of %s: %v", inputFile, err)
 			continue
 		}
-		targetPath := filepath.Join(outputFolder, fileHeader.Name)
+		targetPath := filepath.Join(outputDir, fileHeader.Name)
 		switch fileHeader.Typeflag {
+		// 文件夹
 		case tar.TypeDir:
 			err := os.MkdirAll(targetPath, fileHeader.FileInfo().Mode())
 			if err != nil {
 				logger.Error("Error creating %s directory: %v", targetPath, err)
 				return
 			}
+		// 常规文件
 		case tar.TypeReg:
-			newFileContent, err := os.OpenFile(targetPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, fileHeader.FileInfo().Mode())
+			file, err := os.OpenFile(targetPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, fileHeader.FileInfo().Mode())
 			if err != nil {
 				logger.Error("Error creating %s file: %v", targetPath, err)
 				return
 			}
-			defer newFileContent.Close()
-			_, err = io.Copy(newFileContent, tarFileContent)
+			defer file.Close()
+			_, err = io.Copy(file, tarReader)
 			if err != nil {
 				logger.Error("Error copying %s to %s: %v", fileHeader.Name, targetPath, err)
 				return
 			}
+		// 软链接
+		case tar.TypeSymlink:
+			err := os.Symlink(fileHeader.Linkname, targetPath)
+			if err != nil {
+				logger.Error("Error creating symlink %s -> %s: %v", targetPath, fileHeader.Linkname, err)
+				return
+			}
+		// 硬链接
+		case tar.TypeLink:
+			hardLinks[targetPath] = fileHeader.Linkname
 		default:
-			logger.Error("Unsupported type: %v", fileHeader.Typeflag)
+			logger.Warn("Skipping unsupported type: %v (%s)", fileHeader.Typeflag, fileHeader.Name)
+			continue
+		}
+	}
+	// 处理硬链接
+	for target, origin := range hardLinks {
+		err := os.Link(filepath.Join(outputDir, origin), target)
+		if err != nil {
+			logger.Error("Error creating hardlink %s -> %s: %v", target, origin, err)
 			return
 		}
 	}
